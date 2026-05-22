@@ -13,6 +13,7 @@ const AnoAI = () => {
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1));
     container.appendChild(renderer.domElement as any);
 
     const material = new THREE.ShaderMaterial({
@@ -92,12 +93,29 @@ const AnoAI = () => {
     scene.add(mesh as any);
 
     let frameId: number;
-    const animate = () => {
-      (material.uniforms as any).iTime.value += 0.016;
-      renderer.render(scene, camera);
-      frameId = requestAnimationFrame(animate);
+    let lastTime = 0;
+    const targetFPS = 30;
+    const frameInterval = 1000 / targetFPS;
+    let isVisible = true;
+
+    const handleScroll = () => {
+      isVisible = window.scrollY < window.innerHeight * 1.5;
     };
-    animate();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    const animate = (time: number) => {
+      frameId = requestAnimationFrame(animate);
+      
+      if (!isVisible) return;
+
+      const deltaTime = time - lastTime;
+      if (deltaTime >= frameInterval || lastTime === 0) {
+        lastTime = time - (deltaTime % frameInterval);
+        (material.uniforms as any).iTime.value += 0.016 * (deltaTime / 16.66 || 1);
+        renderer.render(scene, camera);
+      }
+    };
+    requestAnimationFrame(animate);
 
     const handleResize = () => {
       renderer.setSize(window.innerWidth, window.innerHeight);
@@ -108,6 +126,7 @@ const AnoAI = () => {
     return () => {
       cancelAnimationFrame(frameId);
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', handleScroll);
       if (container && renderer.domElement && container.contains(renderer.domElement as any)) {
         container.removeChild(renderer.domElement as any);
       }
