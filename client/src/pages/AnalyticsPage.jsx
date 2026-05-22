@@ -49,14 +49,14 @@ const AnalyticsPage = () => {
       <div className="doodle-circle" style={{ bottom: '150px', left: '40px', backgroundColor: 'var(--bg-pink)' }}></div>
 
       <header className="hero-section" style={{ padding: '4rem 2rem', marginBottom: '40px', backgroundColor: 'var(--bg-green)' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 max-w-[1200px] mx-auto">
           <div>
             <h1 style={{ margin: 0, fontSize: '3rem' }}>Performance <span className="text-highlight" style={{ backgroundColor: 'var(--bg-yellow)', boxShadow: '0 -0.5rem 0 inset var(--bg-yellow)' }}>Analytics</span></h1>
             <p style={{ margin: '10px 0 0', fontWeight: 600, fontSize: '1.2rem', opacity: 0.9 }}>
               Track your progress and identify areas for improvement.
             </p>
           </div>
-          <button className="btn-ghost" onClick={() => navigate('/dashboard')} style={{ backgroundColor: '#fff' }}>
+          <button className="btn-ghost w-full md:w-auto text-center" onClick={() => navigate('/dashboard')} style={{ backgroundColor: '#fff' }}>
             ← Back to Dashboard
           </button>
         </div>
@@ -95,12 +95,7 @@ const AnalyticsPage = () => {
             </h2>
           </div>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1.5fr',
-            gap: '30px',
-            marginBottom: '30px'
-          }}>
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-8 mb-8">
             <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
               <RealTimeInsights data={summary?.trendData?.map(t => ({ name: t.attemptNo, accuracy: t.accuracy }))} />
               <OptimizationChart data={history?.slice(0, 5).reverse().map((h, i) => ({ name: i + 1, score: h.score }))} />
@@ -115,11 +110,7 @@ const AnalyticsPage = () => {
             />
           </div>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '30px'
-          }}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <VariantComparison topics={topics} />
             <SuperchargedMetrics topics={topics} />
           </div>
@@ -134,17 +125,21 @@ const AnalyticsPage = () => {
             <AccuracyTrendChart data={summary?.trendData} />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '40px', marginBottom: '40px' }}>
-            <div className="stacked-card blue" style={{ padding: '30px', backgroundColor: '#fff' }}>
+          <div className="grid grid-cols-1 gap-10 mb-10">
+            <div className="stacked-card blue p-4 md:p-8 bg-white">
               <h3 style={{ marginTop: 0, marginBottom: '10px', fontSize: '1.5rem', fontWeight: 800 }}>Topic Breakdown</h3>
               <p style={{ color: '#666', fontSize: '14px', marginBottom: '25px', fontWeight: 500 }}>
                 Identifies weak areas <span style={{ fontWeight: 800, color: '#ff5c5c' }}>(Accuracy &lt; 50%)</span> that need more focus.
               </p>
-              <TopicBreakdownTable topics={topics} />
+              <div className="overflow-x-auto">
+                <TopicBreakdownTable topics={topics} />
+              </div>
             </div>
-            <div className="stacked-card green" style={{ padding: '30px', backgroundColor: '#fff' }}>
+            <div className="stacked-card green p-4 md:p-8 bg-white">
               <h3 style={{ marginTop: 0, marginBottom: '25px', fontSize: '1.5rem', fontWeight: 800 }}>Test History</h3>
-              <TestHistoryTable history={history} />
+              <div className="overflow-x-auto">
+                <TestHistoryTable history={history} />
+              </div>
             </div>
           </div>
         </div>
