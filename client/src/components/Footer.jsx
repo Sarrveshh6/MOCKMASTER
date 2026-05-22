@@ -1,5 +1,6 @@
 import React from 'react';
 import { Mail, Phone } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
@@ -27,7 +28,7 @@ const Footer = () => {
               }}>
                 <Mail size={18} strokeWidth={3} />
               </div>
-              <span style={{ fontWeight: 900 }}>sarveshkumarsinghhh6@gmail.com</span>
+              <a href="mailto:sarveshkumarsinghhh6@gmail.com" style={{ textDecoration: 'none', color: '#000', fontWeight: 900 }}>sarveshkumarsinghhh6@gmail.com</a>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -42,7 +43,7 @@ const Footer = () => {
               }}>
                 <Phone size={18} strokeWidth={3} />
               </div>
-              <span style={{ fontWeight: 900 }}>+91 6392867714</span>
+              <a href="tel:+916392867714" style={{ textDecoration: 'none', color: '#000', fontWeight: 900 }}>+91 6392867714</a>
             </div>
           </div>
         </div>
@@ -51,11 +52,16 @@ const Footer = () => {
         <div style={{ flex: '0 1 200px' }}>
           <h4 style={{ fontSize: '1.2rem', fontWeight: 900, marginBottom: '25px' }}>QUICK LINKS</h4>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {['HOME', 'ABOUT', 'SERVICES', 'PORTFOLIO', 'BLOG', 'CONTACT'].map((link) => (
-              <li key={link}>
-                <a href="#" style={{ textDecoration: 'none', color: '#000', fontWeight: 700, fontSize: '0.9rem', transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f93109ff'} onMouseOut={(e) => e.target.style.color = '#000'}>
-                  {link}
-                </a>
+            {[
+              { label: 'HOME', to: '/' },
+              { label: 'DASHBOARD', to: '/dashboard' },
+              { label: 'BLOG', to: '/blog' },
+              { label: 'ANALYTICS', to: '/analytics' },
+            ].map((link) => (
+              <li key={link.label}>
+                <Link to={link.to} style={{ textDecoration: 'none', color: '#000', fontWeight: 700, fontSize: '0.9rem', transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f93109ff'} onMouseOut={(e) => e.target.style.color = '#000'}>
+                  {link.label}
+                </Link>
               </li>
             ))}
           </ul>
@@ -65,11 +71,15 @@ const Footer = () => {
         <div style={{ flex: '0 1 200px' }}>
           <h4 style={{ fontSize: '1.2rem', fontWeight: 900, marginBottom: '25px' }}>RESOURCES</h4>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {['DOCUMENTATION', 'API REFERENCE', 'TUTORIALS', 'COMMUNITY', 'SUPPORT', 'STATUS'].map((link) => (
-              <li key={link}>
-                <a href="#" style={{ textDecoration: 'none', color: '#000', fontWeight: 700, fontSize: '0.9rem', transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f93109ff'} onMouseOut={(e) => e.target.style.color = '#000'}>
-                  {link}
-                </a>
+            {[
+              { label: 'DOCUMENTATION', to: '/docs' },
+              { label: 'API REFERENCE', to: '/api-reference' },
+              { label: 'SUPPORT', to: '/support' },
+            ].map((link) => (
+              <li key={link.label}>
+                <Link to={link.to} style={{ textDecoration: 'none', color: '#000', fontWeight: 700, fontSize: '0.9rem', transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f93109ff'} onMouseOut={(e) => e.target.style.color = '#000'}>
+                  {link.label}
+                </Link>
               </li>
             ))}
           </ul>

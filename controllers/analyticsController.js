@@ -1,4 +1,35 @@
 const Result = require('../models/Result');
+const User = require('../models/User');
+const Question = require('../models/Question');
+const Document = require('../models/Document');
+const SystemLog = require('../models/SystemLog');
+
+exports.getAdminStats = async (req, res) => {
+  try {
+    const [userCount, questionCount, pdfCount, results, logs] = await Promise.all([
+      User.countDocuments(),
+      Question.countDocuments({ isBankQuestion: true }),
+      Document.countDocuments(),
+      Result.find().sort({ completedAt: -1 }).limit(20).populate('userId', 'name email'),
+      SystemLog.find().sort({ timestamp: -1 }).limit(50)
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        userCount,
+        globalPyqCount: questionCount,
+        pdfCount,
+        totalAttempts: await Result.countDocuments(),
+        recentResults: results,
+        systemLogs: logs
+      }
+    });
+  } catch (error) {
+    console.error('Admin Analytics Error:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 exports.getSummary = async (req, res) => {
   try {
@@ -6,13 +37,17 @@ exports.getSummary = async (req, res) => {
 
     let totalTests = results.length;
     let highestScore = 0;
+    let highestScoreTotal = 0;
     let totalQuestionsAttempted = 0;
     let sumAccuracy = 0;
 
     const trendData = [];
 
     results.forEach((r, idx) => {
-      if (r.score > highestScore) highestScore = r.score;
+      if (r.score >= highestScore) {
+        highestScore = r.score;
+        highestScoreTotal = r.totalQuestions;
+      }
       totalQuestionsAttempted += r.totalQuestions;
       sumAccuracy += r.accuracy;
 
@@ -28,14 +63,26 @@ exports.getSummary = async (req, res) => {
 
     const averageAccuracy = totalTests > 0 ? (sumAccuracy / totalTests) : 0;
 
+    const [globalPyqCount, pdfCount, totalQuestionCount] = await Promise.all([
+      Question.countDocuments({ isBankQuestion: true }),
+      Document.countDocuments(),
+      Question.countDocuments()
+    ]);
+
     res.status(200).json({
       success: true,
       data: {
         totalTests,
         averageAccuracy,
         highestScore,
+        highestScoreTotal,
         totalQuestionsAttempted,
-        trendData
+        trendData,
+        platformStats: {
+          globalPyqs: globalPyqCount,
+          totalPdfs: pdfCount,
+          totalQuestions: totalQuestionCount
+        }
       }
     });
   } catch (error) {

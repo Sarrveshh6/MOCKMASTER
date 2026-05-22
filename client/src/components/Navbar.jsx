@@ -22,6 +22,9 @@ import {
 } from 'lucide-react';
 
 const ProfileDrawer = ({ isOpen, onClose, user, onLogout, navigate }) => {
+    const location = useLocation();
+    const isActive = (path) => location.pathname === path;
+
     if (!isOpen) return null;
 
     return (
@@ -123,9 +126,9 @@ const ProfileDrawer = ({ isOpen, onClose, user, onLogout, navigate }) => {
                     <div style={{ display: 'grid', gap: '8px' }}>
                         {[
                             { icon: <Settings size={18} />, label: 'Account Settings', to: '/dashboard' },
-                            { icon: <CreditCard size={18} />, label: 'Analytics', to: '/analytics' },
-                            { icon: <History size={18} />, label: 'About us', to: '/' },
-                            { icon: <HelpCircle size={18} />, label: 'Help & Support', to: '/#faq' },
+                            { icon: <CreditCard size={18} />, label: 'Analytics', to: user.role === 'admin' ? '/admin/analytics' : '/analytics' },
+                            { icon: <FileText size={18} />, label: 'Documentation', to: '/docs' },
+                            { icon: <HelpCircle size={18} />, label: 'Help & Support', to: '/support' },
                         ].map((item, idx) => (
                             <div
                                 key={idx}
@@ -143,7 +146,10 @@ const ProfileDrawer = ({ isOpen, onClose, user, onLogout, navigate }) => {
                                     cursor: 'pointer',
                                     fontWeight: 700,
                                     transition: 'all 0.2s',
-                                    border: '2px solid transparent'
+                                    border: isActive(item.to) ? '2px solid #000' : '2px solid transparent',
+                                    backgroundColor: isActive(item.to) ? '#FCEB7B' : 'transparent',
+                                    transform: isActive(item.to) ? 'translateX(4px)' : 'none',
+                                    boxShadow: isActive(item.to) ? '4px 4px 0 rgba(0,0,0,0.1)' : 'none'
                                 }}
                             >
                                 <div style={{ padding: '8px', backgroundColor: '#f0f0f0', borderRadius: '8px', border: '1px solid #000' }}>
@@ -161,7 +167,7 @@ const ProfileDrawer = ({ isOpen, onClose, user, onLogout, navigate }) => {
                         onClick={onLogout}
                         style={{
                             width: '100%',
-                            backgroundColor: '#ff5c5c',
+                            backgroundColor: 'var(--bg-red)',
                             color: '#fff',
                             border: '3px solid #000',
                             boxShadow: '4px 4px 0 #000',
@@ -232,27 +238,31 @@ const Navbar = () => {
                     justifyContent: 'space-between',
                     boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
                 }}>
-                    {/* Logo Section */}
                     <Link to="/" style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '10px',
+                        gap: '12px',
                         textDecoration: 'none',
-                        color: '#000',
+                        color: 'inherit',
                         marginRight: 'auto'
                     }}>
                         <div style={{
-                            width: '32px',
-                            height: '32px',
+                            width: '40px',
+                            height: '40px',
                             backgroundColor: '#000',
-                            borderRadius: '8px',
+                            borderRadius: '10px',
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center'
+                            justifyContent: 'center',
+                            color: '#FCEB7B',
+                            fontSize: '1.5rem',
+                            fontWeight: 900,
+                            transform: 'rotate(-5deg)',
+                            boxShadow: '3px 3px 0 #000'
                         }}>
-                            <div style={{ width: '12px', height: '12px', backgroundColor: '#FCEB7B', borderRadius: '50%' }}></div>
+                            M
                         </div>
-                        <span style={{ fontSize: '1.25rem', fontWeight: 900, letterSpacing: '-0.02em', textTransform: 'uppercase' }}>MOCKMASTER</span>
+                        <h1 style={{ fontSize: '1.5rem', fontWeight: 900, letterSpacing: '-1px', margin: 0 }}>MOCKMASTER</h1>
                     </Link>
 
                     {/* Navigation Links */}
@@ -264,59 +274,98 @@ const Navbar = () => {
                                     alignItems: 'center',
                                     gap: '8px',
                                     textDecoration: 'none',
-                                    color: isActive('/dashboard') ? '#000000ff' : '#111',
+                                    color: '#000',
                                     fontWeight: 800,
-                                    fontSize: '0.9rem'
+                                    fontSize: '0.9rem',
+                                    backgroundColor: isActive('/dashboard') ? 'var(--bg-yellow)' : 'transparent',
+                                    padding: '6px 12px',
+                                    border: isActive('/dashboard') ? '2px solid #000' : '2px solid transparent',
+                                    borderRadius: '8px',
+                                    boxShadow: isActive('/dashboard') ? '3px 3px 0 #000' : 'none'
                                 }}>
                                     <LayoutDashboard size={18} />
                                     <span>Dashboard</span>
                                 </Link>
 
-                                <Link to="/test-config" style={{
+                                {user.role !== 'admin' && (
+                                    <Link to="/test-config" style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '8px',
+                                        textDecoration: 'none',
+                                        color: '#000',
+                                        fontWeight: 800,
+                                        fontSize: '0.9rem',
+                                        backgroundColor: isActive('/test-config') ? 'var(--bg-green)' : 'transparent',
+                                        padding: '6px 12px',
+                                        border: isActive('/test-config') ? '2px solid #000' : '2px solid transparent',
+                                        borderRadius: '8px',
+                                        boxShadow: isActive('/test-config') ? '3px 3px 0 #000' : 'none'
+                                    }}>
+                                        <FileText size={18} />
+                                        <span>Take a Test</span>
+                                    </Link>
+                                )}
+
+
+                                <Link to={user.role === 'admin' ? '/admin/analytics' : '/analytics'} style={{
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '8px',
                                     textDecoration: 'none',
-                                    color: isActive('/test-config') ? '#000' : '#111',
+                                    color: '#000',
                                     fontWeight: 800,
                                     fontSize: '0.9rem',
-                                    // backgroundColor: '#A0FF9C',
+                                    backgroundColor: (user.role === 'admin' ? isActive('/admin/analytics') : isActive('/analytics')) ? 'var(--bg-purple)' : 'transparent',
                                     padding: '6px 12px',
-                                    // border: '2px solid #000',
+                                    border: (user.role === 'admin' ? isActive('/admin/analytics') : isActive('/analytics')) ? '2px solid #000' : '2px solid transparent',
                                     borderRadius: '8px',
-                                    // boxShadow: '2px 2px 0 #000'
-                                }}>
-                                    <FileText size={18} />
-                                    <span>Take a Test</span>
-                                </Link>
-
-
-                                <Link to="/analytics" style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '8px',
-                                    textDecoration: 'none',
-                                    color: isActive('/analytics') ? '#000' : '#111',
-                                    fontWeight: 800,
-                                    fontSize: '0.9rem'
+                                    boxShadow: (user.role === 'admin' ? isActive('/admin/analytics') : isActive('/analytics')) ? '3px 3px 0 #000' : 'none'
                                 }}>
                                     <BarChart2 size={18} />
-                                    <span>Analytics</span>
+                                    <span>{user.role === 'admin' ? 'User Analytics' : 'Analytics'}</span>
                                     <ChevronDown size={14} />
                                 </Link>
 
-                                <Link to="/questions" style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '8px',
-                                    textDecoration: 'none',
-                                    color: isActive('/questions') ? '#000' : '#111',
-                                    fontWeight: 800,
-                                    fontSize: '0.9rem'
-                                }}>
-                                    <BookOpen size={18} />
-                                    <span>Practice</span>
-                                </Link>
+                                {user.role !== 'admin' && (
+                                    <Link to="/questions" style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '8px',
+                                        textDecoration: 'none',
+                                        color: '#000',
+                                        fontWeight: 800,
+                                        fontSize: '0.9rem',
+                                        backgroundColor: isActive('/questions') ? 'var(--bg-blue)' : 'transparent',
+                                        padding: '6px 12px',
+                                        border: isActive('/questions') ? '2px solid #000' : '2px solid transparent',
+                                        borderRadius: '8px',
+                                        boxShadow: isActive('/questions') ? '3px 3px 0 #000' : 'none'
+                                    }}>
+                                        <BookOpen size={18} />
+                                        <span>Practice</span>
+                                    </Link>
+                                )}
+
+                                {user.role === 'admin' && (
+                                    <Link to="/blog" style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '8px',
+                                        textDecoration: 'none',
+                                        color: '#000',
+                                        fontWeight: 800,
+                                        fontSize: '0.9rem',
+                                        backgroundColor: isActive('/blog') ? 'var(--bg-pink)' : 'transparent',
+                                        padding: '6px 12px',
+                                        border: isActive('/blog') ? '2px solid #000' : '2px solid transparent',
+                                        borderRadius: '8px',
+                                        boxShadow: isActive('/blog') ? '3px 3px 0 #000' : 'none'
+                                    }}>
+                                        <FileText size={18} />
+                                        <span>Blogs</span>
+                                    </Link>
+                                )}
 
                                 {user.role === 'admin' && (
                                     <Link to="/admin/questions" style={{
@@ -324,9 +373,14 @@ const Navbar = () => {
                                         alignItems: 'center',
                                         gap: '8px',
                                         textDecoration: 'none',
-                                        color: isActive('/admin/questions') ? '#000' : '#111',
+                                        color: '#000',
                                         fontWeight: 800,
-                                        fontSize: '0.9rem'
+                                        fontSize: '0.9rem',
+                                        backgroundColor: isActive('/admin/questions') ? 'var(--bg-orange)' : 'transparent',
+                                        padding: '6px 12px',
+                                        border: isActive('/admin/questions') ? '2px solid #000' : '2px solid transparent',
+                                        borderRadius: '8px',
+                                        boxShadow: isActive('/admin/questions') ? '3px 3px 0 #000' : 'none'
                                     }}>
                                         <ShieldCheck size={18} />
                                         <span>Admin Bank</span>
@@ -334,13 +388,34 @@ const Navbar = () => {
                                 )}
                             </>
                         )}
-                        {/* {!user && (
-                            <div style={{ display: 'flex', gap: '20px', color: '#666', fontWeight: 700, fontSize: '0.9rem' }}>
-                                <a href="#features" style={{ textDecoration: 'none', color: 'inherit' }}>Features</a>
-                                <a href="#how-it-works" style={{ textDecoration: 'none', color: 'inherit' }}>How it works</a>
-                                <a href="#faq" style={{ textDecoration: 'none', color: 'inherit' }}>About us</a>
+                        {!user && (
+                            <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+                                {[
+                                    { label: 'Blog', to: '/blog', color: 'var(--bg-orange)' },
+                                    { label: 'Docs', to: '/docs', color: 'var(--bg-cyan)' },
+                                    { label: 'Support', to: '/support', color: 'var(--bg-purple)' },
+                                ].map((link) => (
+                                    <Link
+                                        key={link.to}
+                                        to={link.to}
+                                        style={{
+                                            textDecoration: 'none',
+                                            color: '#000',
+                                            fontWeight: 800,
+                                            fontSize: '0.9rem',
+                                            padding: '6px 14px',
+                                            backgroundColor: isActive(link.to) ? link.color : 'transparent',
+                                            border: isActive(link.to) ? '2px solid #000' : '2px solid transparent',
+                                            borderRadius: '8px',
+                                            boxShadow: isActive(link.to) ? '3px 3px 0 #000' : 'none',
+                                            transition: 'all 0.2s'
+                                        }}
+                                    >
+                                        {link.label}
+                                    </Link>
+                                ))}
                             </div>
-                        )} */}
+                        )}
                     </div>
 
                     {/* Action Icons */}

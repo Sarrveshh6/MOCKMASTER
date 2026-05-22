@@ -14,8 +14,12 @@ html {
   --bg-beige: #FCF5E5;
   --bg-pink: #F0A6CA;
   --bg-green: #A0FF9C;
-  --bg-blue: #F0A6CA; /* Changed from blue to pink at user request */
+  --bg-blue: #60A5FA;
   --bg-yellow: #FCEB7B;
+  --bg-purple: #A78BFA;
+  --bg-orange: #FB923C;
+  --bg-cyan: #22D3EE;
+  --bg-red: #F87171;
 
   --surface: var(--bg-beige);
   --on-surface: #000000;
@@ -327,7 +331,9 @@ button:active:not(:disabled) {
   transition: all 0.2s;
   border: 2px solid transparent;
 }
-.nav-link:hover, .nav-link.active {
+
+.nav-link:hover,
+.nav-link.active {
   background: var(--bg-yellow);
   border: 2px solid #000;
   transform: translateX(4px);
@@ -336,7 +342,8 @@ button:active:not(:disabled) {
 
 /* ─── Authentication Page Styles (Fixing submerged/squashed layouts) ─── */
 .auth-page {
-  min-height: calc(100vh - 80px); /* Account for navbar */
+  min-height: calc(100vh - 80px);
+  /* Account for navbar */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -452,14 +459,20 @@ button:active:not(:disabled) {
   color: #888;
 }
 
-.divider::before, .divider::after {
+.divider::before,
+.divider::after {
   content: '';
   flex: 1;
   border-bottom: 2px solid #eee;
 }
 
-.divider:not(:empty)::before { margin-right: 15px; }
-.divider:not(:empty)::after { margin-left: 15px; }
+.divider:not(:empty)::before {
+  margin-right: 15px;
+}
+
+.divider:not(:empty)::after {
+  margin-left: 15px;
+}
 
 .social-btns {
   display: flex;
@@ -489,9 +502,19 @@ button:active:not(:disabled) {
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-5px);
+  }
+
+  75% {
+    transform: translateX(5px);
+  }
 }
 
 @media (max-width: 480px) {

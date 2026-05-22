@@ -10,7 +10,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { login, guestLogin, adminLogin } = useAuth();
+  const { login, adminLogin } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -28,18 +28,6 @@ const Login = () => {
     }
   };
 
-  const handleGuestLogin = async () => {
-    setError('');
-    setLoading(true);
-    try {
-      await guestLogin();
-      navigate('/dashboard');
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to login as guest');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleAdminLogin = async () => {
     if (!email || !password) {
@@ -124,15 +112,6 @@ const Login = () => {
               {loading ? 'Authenticating...' : 'Sign In Now'}
             </button>
 
-            {/* <button 
-              type="button" 
-              onClick={handleGuestLogin} 
-              disabled={loading} 
-              className="btn-dark" 
-              style={{ width: '100%', padding: '1rem' }}
-            >
-              🚀 Continue as Guest
-            </button> */}
 
             <button
               type="button"

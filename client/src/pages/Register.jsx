@@ -138,7 +138,7 @@ const Register = () => {
             <button type="submit" disabled={loading} className="btn-yellow" style={{ width: '100%', padding: '1rem', marginTop: '10px' }}>
               {loading ? 'Creating Account...' : 'Create Account'}
             </button>
-            <button
+            {/* <button
               type="button"
               onClick={handleGuestLogin}
               disabled={loading}
@@ -146,7 +146,7 @@ const Register = () => {
               style={{ width: '100%', padding: '1rem' }}
             >
               🚀 Continue as Guest
-            </button>
+            </button> */}
           </form>
 
           {/* <div className="divider">OR REGISTER WITH</div>

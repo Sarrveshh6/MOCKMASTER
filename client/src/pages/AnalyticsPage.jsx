@@ -77,7 +77,9 @@ const AnalyticsPage = () => {
             </div>
             <div className="stacked-card blue" style={{ padding: '25px', backgroundColor: '#fff' }}>
               <h4 style={{ margin: '0 0 10px', color: '#666', fontWeight: 800, textTransform: 'uppercase', fontSize: '13px', letterSpacing: '0.05em' }}>Highest Score</h4>
-              <div style={{ fontSize: '3rem', fontWeight: 900, color: '#000', lineHeight: 1 }}>{summary.highestScore}</div>
+              <div style={{ fontSize: '3rem', fontWeight: 900, color: '#000', lineHeight: 1 }}>
+                {summary.highestScore} <span style={{ fontSize: '1.5rem', opacity: 0.5 }}>/ {summary.highestScoreTotal || 0}</span>
+              </div>
             </div>
             <div className="stacked-card green" style={{ padding: '25px', backgroundColor: '#fff' }}>
               <h4 style={{ margin: '0 0 10px', color: '#666', fontWeight: 800, textTransform: 'uppercase', fontSize: '13px', letterSpacing: '0.05em' }}>Questions Attempted</h4>

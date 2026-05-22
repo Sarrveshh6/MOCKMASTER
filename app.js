@@ -35,8 +35,24 @@ function createApp(betterAuthHandler) {
   app.use('/api/questions', require('./routes/questionRoutes'));
   app.use('/api/test', require('./routes/testRoutes'));
   app.use('/api/analytics', require('./routes/analyticsRoutes'));
+  app.use('/api/blogs', require('./routes/blogRoutes'));
 
   app.post('/api/pdf/debug-parse', protect, admin, upload.single('pdf'), pdfController.debugParsePDF);
+
+  // ─── Serve Static Frontend (Approach B) ─────────────────────────────────────────
+  const path = require('path');
+  const fs = require('fs');
+  const clientDistPath = path.join(__dirname, 'client', 'dist');
+
+  if (fs.existsSync(clientDistPath)) {
+    app.use(express.static(clientDistPath));
+    app.use((req, res, next) => {
+      if (req.path.startsWith('/api')) {
+        return next();
+      }
+      res.sendFile(path.join(clientDistPath, 'index.html'));
+    });
+  }
 
   // ─── 404 Handler ──────────────────────────────────────────────────────────────
   app.use((req, res) => {

@@ -5,7 +5,10 @@
   "main": "server.js",
   "scripts": {
     "start": "node --import tsx server.js",
-    "dev": "nodemon --exec \"node --import tsx\" server.js"
+    "dev": "nodemon --exec \"node --import tsx\" server.js",
+    "install:client": "npm install --prefix client",
+    "build:client": "npm run build --prefix client",
+    "build": "npm run install:client && npm run build:client"
   },
   "keywords": [],
   "author": "",

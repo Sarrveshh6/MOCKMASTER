@@ -17,7 +17,7 @@ const QuestionBankPage = () => {
   const [loading, setLoading] = useState(true);
   const [attemptingGroup, setAttemptingGroup] = useState(null);
   const [error, setError] = useState(null);
-  const [filters, setFilters] = useState({ subject: '', difficulty: '' });
+  const [filters, setFilters] = useState({ subject: '', difficulty: '', time: 'all' });
 
   const fetchQuestions = useCallback(async () => {
     try {
@@ -63,6 +63,7 @@ const QuestionBankPage = () => {
   const groupedQuestions = useMemo(() => {
     let filtered = questions;
     
+    // Search filter
     if (filters.search) {
       const term = filters.search.toLowerCase();
       filtered = questions.filter(q => 
@@ -72,17 +73,33 @@ const QuestionBankPage = () => {
       );
     }
 
+    // Time filter (Client-side for now to avoid complex backend queries for nested populate fields)
+    if (view === 'user' && filters.time !== 'all') {
+      const now = new Date();
+      filtered = filtered.filter(q => {
+        if (!q.documentId?.uploadedAt) return false;
+        const uploadDate = new Date(q.documentId.uploadedAt);
+        const diffHours = (now - uploadDate) / (1000 * 60 * 60);
+        
+        if (filters.time === '24h') return diffHours <= 24;
+        if (filters.time === '7d') return diffHours <= 24 * 7;
+        if (filters.time === '30d') return diffHours <= 24 * 30;
+        return true;
+      });
+    }
+
     const groups = {};
 
     filtered.forEach((q) => {
       if (view === 'user') {
         const docId = q.documentId?._id || q.documentId;
         const fileName = q.documentId?.originalName;
+        const uploadedAt = q.documentId?.uploadedAt;
         const key = docId || (q.source.includes('AI') ? 'ai-no-document' : 'manual-group');
         const label = fileName || (q.source.includes('AI') ? 'AI Extracted (Unknown PDF)' : 'Manual / Other Questions');
         
         if (!groups[key]) {
-          groups[key] = { label, typeLabel: 'PDF Group', questions: [] };
+          groups[key] = { label, typeLabel: 'PDF Group', questions: [], uploadedAt };
         }
         groups[key].questions.push(q);
       } else {
@@ -108,7 +125,12 @@ const QuestionBankPage = () => {
     if (view === 'user') {
       return Object.entries(groups)
         .map(([key, value]) => ({ key, ...value }))
-        .sort((a, b) => b.questions.length - a.questions.length);
+        .sort((a, b) => {
+          // Newest PDF on top
+          const dateA = a.uploadedAt ? new Date(a.uploadedAt) : new Date(0);
+          const dateB = b.uploadedAt ? new Date(b.uploadedAt) : new Date(0);
+          return dateB - dateA;
+        });
     } else {
       // Hierarchical grouping for Bank View
       return Object.entries(groups).map(([subject, data]) => ({
@@ -121,7 +143,7 @@ const QuestionBankPage = () => {
         })).sort((a, b) => b.questions.length - a.questions.length)
       })).sort((a, b) => a.label.localeCompare(b.label));
     }
-  }, [questions, view]);
+  }, [questions, view, filters]);
 
   const handleAttemptGroup = async (groupOrTopic, isTopic = false) => {
     // For user view, we need a document ID.
@@ -232,7 +254,7 @@ const QuestionBankPage = () => {
           </div>
         )}
 
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '20px', marginBottom: '30px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: view === 'user' ? '2fr 1fr 1fr 1fr' : '2fr 1fr 1fr', gap: '20px', marginBottom: '30px' }}>
           <div style={{ position: 'relative' }}>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: '800', fontSize: '13px', textTransform: 'uppercase' }}>Search Collection</label>
             <div style={{ position: 'relative' }}>
@@ -279,6 +301,22 @@ const QuestionBankPage = () => {
               <option value="Hard">Hard</option>
             </select>
           </div>
+          {view === 'user' && (
+            <div>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '800', fontSize: '13px', textTransform: 'uppercase' }}>Uploaded Within</label>
+              <select 
+                name="time" 
+                value={filters.time} 
+                onChange={handleFilterChange}
+                style={{ width: '100%', padding: '12px', border: '3px solid #000', borderRadius: '12px', fontWeight: '800', outline: 'none', backgroundColor: '#fff' }}
+              >
+                <option value="all">All Time</option>
+                <option value="24h">Last 24 Hours</option>
+                <option value="7d">Last 7 Days</option>
+                <option value="30d">Last 30 Days</option>
+              </select>
+            </div>
+          )}
         </div>
 
         <style>
@@ -339,7 +377,10 @@ const QuestionBankPage = () => {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '14px' }}>
                       <div>
                         <div style={{ fontWeight: 800, fontSize: '1.1rem' }}>{group.questions.length} questions available</div>
-                        <p style={{ margin: '4px 0 0', fontWeight: 600, opacity: 0.7 }}>Source: Extractions from your uploaded PDF</p>
+                        <p style={{ margin: '4px 0 0', fontWeight: 600, opacity: 0.7 }}>
+                          Source: {group.label} 
+                          {group.uploadedAt && ` • Uploaded: ${new Date(group.uploadedAt).toLocaleDateString()}`}
+                        </p>
                       </div>
                       <div style={{ display: 'flex', gap: '10px' }}>
                         <button

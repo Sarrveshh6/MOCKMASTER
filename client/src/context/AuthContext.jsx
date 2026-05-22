@@ -51,19 +51,6 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  const guestLogin = async () => {
-    try {
-      const res = await api.post('/legacy-auth/guest-login');
-      localStorage.setItem('token', res.data.token);
-      
-      const userRes = await api.get('/legacy-auth/me');
-      setUser(userRes.data.data);
-    } catch (error) {
-      console.warn('Backend or MongoDB is unreachable! Injecting Offline preview user.');
-      localStorage.setItem('token', 'OFFLINE_PREVIEW_TOKEN');
-      setUser({ _id: '123456789', name: 'UI Previewer', email: 'offline@mockmaster.ai' });
-    }
-  };
 
   const adminLogin = async (email, password) => {
     const res = await api.post('/legacy-auth/admin-login', { email, password });
@@ -74,7 +61,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, guestLogin, adminLogin, loading }}>
+    <AuthContext.Provider value={{ user, login, register, logout, adminLogin, loading }}>
       {!loading && children}
     </AuthContext.Provider>
   );

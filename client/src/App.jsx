@@ -21,6 +21,11 @@ import AnalyticsPage from './pages/AnalyticsPage'
 import AdminQuestionBankPage from './pages/AdminQuestionBankPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
+import DocsPage from './pages/DocsPage'
+import ApiReferencePage from './pages/ApiReferencePage'
+import BlogPage from './pages/BlogPage'
+import SupportPage from './pages/SupportPage'
+import AdminAnalyticsPage from './pages/AdminAnalyticsPage'
 
 import Footer from './components/Footer'
 
@@ -80,11 +85,15 @@ function AppRoutes() {
       {!isExamMode && <Navbar />}
       <main className="main-content" style={{ flex: 1 }}>
         <Routes>
-          <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={user ? <Navigate to="/dashboard" /> : <LandingPage />} />
           <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
           <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+          <Route path="/docs" element={<DocsPage />} />
+          <Route path="/api-reference" element={<ApiReferencePage />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/support" element={<SupportPage />} />
           
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
@@ -99,6 +108,7 @@ function AppRoutes() {
 
           <Route element={<AdminRoute />}>
             <Route path="/admin/questions" element={<AdminQuestionBankPage />} />
+            <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
           </Route>
         </Routes>
       </main>
