@@ -1,36 +1,52 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { NotificationProvider } from './context/NotificationContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminRoute from './components/AdminRoute'
-import AnoAI from './components/ui/animated-shader-background'
 import Navbar from './components/Navbar'
 import ScrollToTop from './components/ScrollToTop'
-import Login from './pages/Login'
-import Register from './pages/Register'
-import Dashboard from './pages/Dashboard'
-import LandingPage from './pages/LandingPage'
-import UploadPage from './pages/UploadPage'
-import ReviewPage from './pages/ReviewPage'
-import QuestionBankPage from './pages/QuestionBankPage'
-import TestConfigPage from './pages/TestConfigPage'
-import TestCanvasPage from './pages/TestCanvasPage'
-import ResultPage from './pages/ResultPage'
-import AnalyticsPage from './pages/AnalyticsPage'
-import AdminQuestionBankPage from './pages/AdminQuestionBankPage'
-import ForgotPasswordPage from './pages/ForgotPasswordPage'
-import ResetPasswordPage from './pages/ResetPasswordPage'
-import DocsPage from './pages/DocsPage'
-import ApiReferencePage from './pages/ApiReferencePage'
-import BlogPage from './pages/BlogPage'
-import SupportPage from './pages/SupportPage'
-import AdminAnalyticsPage from './pages/AdminAnalyticsPage'
-
 import Footer from './components/Footer'
+
+const AnoAI = lazy(() => import('./components/ui/animated-shader-background'))
+const Login = lazy(() => import('./pages/Login'))
+const Register = lazy(() => import('./pages/Register'))
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const LandingPage = lazy(() => import('./pages/LandingPage'))
+const UploadPage = lazy(() => import('./pages/UploadPage'))
+const ReviewPage = lazy(() => import('./pages/ReviewPage'))
+const QuestionBankPage = lazy(() => import('./pages/QuestionBankPage'))
+const TestConfigPage = lazy(() => import('./pages/TestConfigPage'))
+const TestCanvasPage = lazy(() => import('./pages/TestCanvasPage'))
+const ResultPage = lazy(() => import('./pages/ResultPage'))
+const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'))
+const AdminQuestionBankPage = lazy(() => import('./pages/AdminQuestionBankPage'))
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'))
+const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'))
+const DocsPage = lazy(() => import('./pages/DocsPage'))
+const ApiReferencePage = lazy(() => import('./pages/ApiReferencePage'))
+const BlogPage = lazy(() => import('./pages/BlogPage'))
+const SupportPage = lazy(() => import('./pages/SupportPage'))
+const AdminAnalyticsPage = lazy(() => import('./pages/AdminAnalyticsPage'))
 
 // Routes that should lock the UI into exam mode (no navbar, footer, or scrolling)
 const EXAM_ROUTES = ['/test-canvas'];
+
+const PageLoader = () => (
+  <div style={{ 
+    height: '100vh', 
+    display: 'flex', 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    backgroundColor: 'var(--bg-beige)',
+    fontFamily: 'var(--font-heading)'
+  }}>
+    <div style={{ textAlign: 'center' }}>
+      <h2 style={{ fontSize: '2rem', fontWeight: 900 }}>Loading MockMaster...</h2>
+      <div className="doodle-pulse" style={{ marginTop: '20px', fontSize: '3rem' }}>🚀</div>
+    </div>
+  </div>
+);
 
 function AppRoutes() {
   const { user, loading } = useAuth();
@@ -62,21 +78,7 @@ function AppRoutes() {
   }, [isExamMode]);
 
   if (loading) {
-    return (
-      <div style={{ 
-        height: '100vh', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        backgroundColor: 'var(--bg-beige)',
-        fontFamily: 'var(--font-heading)'
-      }}>
-        <div style={{ textAlign: 'center' }}>
-          <h2 style={{ fontSize: '2rem', fontWeight: 900 }}>Loading MockMaster...</h2>
-          <div className="doodle-pulse" style={{ marginTop: '20px', fontSize: '3rem' }}>🚀</div>
-        </div>
-      </div>
-    );
+    return <PageLoader />;
   }
 
   return (
@@ -84,33 +86,35 @@ function AppRoutes() {
       {/* Hide navbar and animated background during exam */}
       {!isExamMode && <Navbar />}
       <main className="main-content" style={{ flex: 1 }}>
-        <Routes>
-          <Route path="/" element={user ? <Navigate to="/dashboard" /> : <LandingPage />} />
-          <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
-          <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-          <Route path="/docs" element={<DocsPage />} />
-          <Route path="/api-reference" element={<ApiReferencePage />} />
-          <Route path="/blog" element={<BlogPage />} />
-          <Route path="/support" element={<SupportPage />} />
-          
-          <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/upload" element={<UploadPage />} />
-            <Route path="/review" element={<ReviewPage />} />
-            <Route path="/questions" element={<QuestionBankPage />} />
-            <Route path="/test-config" element={<TestConfigPage />} />
-            <Route path="/test-canvas" element={<TestCanvasPage />} />
-            <Route path="/result/:id" element={<ResultPage />} />
-            <Route path="/analytics" element={<AnalyticsPage />} />
-          </Route>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route path="/" element={user ? <Navigate to="/dashboard" /> : <LandingPage />} />
+            <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
+            <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+            <Route path="/docs" element={<DocsPage />} />
+            <Route path="/api-reference" element={<ApiReferencePage />} />
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/support" element={<SupportPage />} />
+            
+            <Route element={<ProtectedRoute />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/upload" element={<UploadPage />} />
+              <Route path="/review" element={<ReviewPage />} />
+              <Route path="/questions" element={<QuestionBankPage />} />
+              <Route path="/test-config" element={<TestConfigPage />} />
+              <Route path="/test-canvas" element={<TestCanvasPage />} />
+              <Route path="/result/:id" element={<ResultPage />} />
+              <Route path="/analytics" element={<AnalyticsPage />} />
+            </Route>
 
-          <Route element={<AdminRoute />}>
-            <Route path="/admin/questions" element={<AdminQuestionBankPage />} />
-            <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
-          </Route>
-        </Routes>
+            <Route element={<AdminRoute />}>
+              <Route path="/admin/questions" element={<AdminQuestionBankPage />} />
+              <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
+            </Route>
+          </Routes>
+        </Suspense>
       </main>
       {/* Hide footer during exam */}
       {!isExamMode && <Footer />}
@@ -140,7 +144,11 @@ function AnoAIWrapper() {
   const location = useLocation();
   const isExamMode = EXAM_ROUTES.some(r => location.pathname.startsWith(r));
   if (isExamMode) return null;
-  return <AnoAI />;
+  return (
+    <Suspense fallback={null}>
+      <AnoAI />
+    </Suspense>
+  );
 }
 
 export default App

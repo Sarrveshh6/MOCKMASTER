@@ -18,7 +18,8 @@ import {
     History,
     LifeBuoy,
     FileText,
-    HelpCircle
+    HelpCircle,
+    Menu
 } from 'lucide-react';
 
 const ProfileDrawer = ({ isOpen, onClose, user, onLogout, navigate }) => {
@@ -196,6 +197,83 @@ const ProfileDrawer = ({ isOpen, onClose, user, onLogout, navigate }) => {
     );
 };
 
+const MobileDrawer = ({ isOpen, onClose, user, navigate }) => {
+    const location = useLocation();
+    const isActive = (path) => location.pathname === path;
+
+    if (!isOpen) return null;
+
+    return (
+        <>
+            <div onClick={onClose} style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(4px)', zIndex: 2000 }} />
+            <div style={{ position: 'fixed', top: 0, left: 0, height: '100vh', width: '100%', maxWidth: '300px', backgroundColor: '#fff', borderRight: '4px solid #000', zIndex: 2001, display: 'flex', flexDirection: 'column', boxShadow: '10px 0 0 rgba(0,0,0,0.1)', animation: 'slideInLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}>
+                <div style={{ padding: '24px', borderBottom: '3px solid #000', display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#FCEB7B' }}>
+                    <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 900 }}>MENU</h2>
+                    <button onClick={onClose} style={{ background: '#000', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '4px 4px 0 rgba(0,0,0,0.2)' }}>
+                        <X size={20} />
+                    </button>
+                </div>
+                <div style={{ flex: 1, padding: '20px 12px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {user ? (
+                        <>
+                            <div className="profile-menu-item" onClick={() => { onClose(); navigate('/dashboard'); }} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '12px', cursor: 'pointer', fontWeight: 700, border: isActive('/dashboard') ? '2px solid #000' : '2px solid transparent', backgroundColor: isActive('/dashboard') ? 'var(--bg-yellow)' : 'transparent' }}>
+                                <LayoutDashboard size={18} /> Dashboard
+                            </div>
+                            {user.role !== 'admin' && (
+                                <div className="profile-menu-item" onClick={() => { onClose(); navigate('/test-config'); }} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '12px', cursor: 'pointer', fontWeight: 700, border: isActive('/test-config') ? '2px solid #000' : '2px solid transparent', backgroundColor: isActive('/test-config') ? 'var(--bg-green)' : 'transparent' }}>
+                                    <FileText size={18} /> Take a Test
+                                </div>
+                            )}
+                            <div className="profile-menu-item" onClick={() => { onClose(); navigate(user.role === 'admin' ? '/admin/analytics' : '/analytics'); }} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '12px', cursor: 'pointer', fontWeight: 700, border: isActive(user.role === 'admin' ? '/admin/analytics' : '/analytics') ? '2px solid #000' : '2px solid transparent', backgroundColor: isActive(user.role === 'admin' ? '/admin/analytics' : '/analytics') ? 'var(--bg-purple)' : 'transparent' }}>
+                                <BarChart2 size={18} /> {user.role === 'admin' ? 'User Analytics' : 'Analytics'}
+                            </div>
+                            {user.role !== 'admin' && (
+                                <div className="profile-menu-item" onClick={() => { onClose(); navigate('/questions'); }} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '12px', cursor: 'pointer', fontWeight: 700, border: isActive('/questions') ? '2px solid #000' : '2px solid transparent', backgroundColor: isActive('/questions') ? 'var(--bg-blue)' : 'transparent' }}>
+                                    <BookOpen size={18} /> Practice
+                                </div>
+                            )}
+                            {user.role === 'admin' && (
+                                <div className="profile-menu-item" onClick={() => { onClose(); navigate('/blog'); }} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '12px', cursor: 'pointer', fontWeight: 700, border: isActive('/blog') ? '2px solid #000' : '2px solid transparent', backgroundColor: isActive('/blog') ? 'var(--bg-pink)' : 'transparent' }}>
+                                    <FileText size={18} /> Blogs
+                                </div>
+                            )}
+                            {user.role === 'admin' && (
+                                <div className="profile-menu-item" onClick={() => { onClose(); navigate('/admin/questions'); }} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '12px', cursor: 'pointer', fontWeight: 700, border: isActive('/admin/questions') ? '2px solid #000' : '2px solid transparent', backgroundColor: isActive('/admin/questions') ? 'var(--bg-orange)' : 'transparent' }}>
+                                    <ShieldCheck size={18} /> Admin Bank
+                                </div>
+                            )}
+                        </>
+                    ) : (
+                        <>
+                            <div className="profile-menu-item" onClick={() => { onClose(); navigate('/blog'); }} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '12px', cursor: 'pointer', fontWeight: 700, border: isActive('/blog') ? '2px solid #000' : '2px solid transparent', backgroundColor: isActive('/blog') ? 'var(--bg-orange)' : 'transparent' }}>
+                                Blog
+                            </div>
+                            <div className="profile-menu-item" onClick={() => { onClose(); navigate('/docs'); }} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '12px', cursor: 'pointer', fontWeight: 700, border: isActive('/docs') ? '2px solid #000' : '2px solid transparent', backgroundColor: isActive('/docs') ? 'var(--bg-cyan)' : 'transparent' }}>
+                                Docs
+                            </div>
+                            <div className="profile-menu-item" onClick={() => { onClose(); navigate('/support'); }} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '12px', cursor: 'pointer', fontWeight: 700, border: isActive('/support') ? '2px solid #000' : '2px solid transparent', backgroundColor: isActive('/support') ? 'var(--bg-purple)' : 'transparent' }}>
+                                Support
+                            </div>
+                        </>
+                    )}
+                </div>
+                {!user && (
+                    <div style={{ padding: '24px', borderTop: '3px solid #000', backgroundColor: '#fff', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        <button onClick={() => { onClose(); navigate('/login'); }} style={{ width: '100%', backgroundColor: '#fff', color: '#000', border: '3px solid #000', boxShadow: '4px 4px 0 #000', fontSize: '1.1rem', padding: '12px', borderRadius: '8px', fontWeight: 'bold' }}>LOGIN</button>
+                        <button onClick={() => { onClose(); navigate('/register'); }} style={{ width: '100%', backgroundColor: '#FCEB7B', color: '#000', border: '3px solid #000', boxShadow: '4px 4px 0 #000', fontSize: '1.1rem', padding: '12px', borderRadius: '8px', fontWeight: 'bold' }}>JOIN</button>
+                    </div>
+                )}
+                <style>{`
+                  @keyframes slideInLeft {
+                    from { transform: translateX(-100%); }
+                    to { transform: translateX(0); }
+                  }
+                `}</style>
+            </div>
+        </>
+    );
+};
+
 const Navbar = () => {
     const { user, logout } = useAuth();
     const { unreadCount } = useNotifications();
@@ -203,6 +281,7 @@ const Navbar = () => {
     const location = useLocation();
     const [notifOpen, setNotifOpen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const notifAnchorRef = useRef(null);
 
     const handleLogout = async () => {
@@ -228,14 +307,10 @@ const Navbar = () => {
                 maxWidth: '1200px',
                 zIndex: 1000
             }}>
-                <div style={{
+                <div className="px-4 md:px-6 py-3 flex items-center justify-between" style={{
                     backgroundColor: '#fff',
                     border: '2px solid #000',
                     borderRadius: '16px',
-                    padding: '12px 24px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
                     boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
                 }}>
                     <Link to="/" style={{
@@ -266,7 +341,7 @@ const Navbar = () => {
                     </Link>
 
                     {/* Navigation Links */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '20px', margin: '0 40px' }}>
+                    <div className="hidden lg:flex" style={{ alignItems: 'center', gap: '20px', margin: '0 40px' }}>
                         {user && (
                             <>
                                 <Link to="/dashboard" style={{
@@ -419,7 +494,7 @@ const Navbar = () => {
                     </div>
 
                     {/* Action Icons */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginLeft: 'auto' }}>
+                    <div className="hidden lg:flex" style={{ alignItems: 'center', gap: '20px', marginLeft: 'auto' }}>
                         {user && (
                             <div style={{ display: 'flex', alignItems: 'center', gap: '15px', paddingRight: '15px', borderRight: '1px solid #eee' }}>
                                 <div ref={notifAnchorRef} style={{ position: 'relative' }}>
@@ -511,6 +586,30 @@ const Navbar = () => {
                             </div>
                         )}
                     </div>
+
+                    {/* Mobile Menu Icon */}
+                    <div className="lg:hidden flex" style={{ alignItems: 'center', gap: '15px', marginLeft: 'auto' }}>
+                        {user && (
+                            <>
+                                <div ref={notifAnchorRef} style={{ position: 'relative' }}>
+                                    <button type="button" onClick={() => setNotifOpen((o) => !o)} style={{ background: 'none', border: 'none', padding: '4px', cursor: 'pointer', display: 'flex' }}>
+                                        <Bell size={22} style={{ color: '#000' }} strokeWidth={2.5} />
+                                    </button>
+                                    {unreadCount > 0 && (
+                                        <span style={{ position: 'absolute', top: '-4px', right: '-6px', minWidth: '18px', height: '18px', padding: '0 4px', backgroundColor: '#ff5c5c', color: '#fff', borderRadius: '999px', border: '2px solid #fff', fontSize: '10px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            {unreadCount > 9 ? '9+' : unreadCount}
+                                        </span>
+                                    )}
+                                </div>
+                                <div onClick={() => setProfileOpen(true)} style={{ width: '32px', height: '32px', backgroundColor: '#F0A6CA', border: '2px solid #000', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                                    <User size={16} />
+                                </div>
+                            </>
+                        )}
+                        <button onClick={() => setMobileMenuOpen(true)} style={{ background: '#fff', border: '2px solid #000', borderRadius: '8px', padding: '6px', cursor: 'pointer', boxShadow: '3px 3px 0 #000', display: 'flex' }}>
+                            <Menu size={20} />
+                        </button>
+                    </div>
                 </div>
             </nav>
 
@@ -519,6 +618,12 @@ const Navbar = () => {
                 onClose={() => setProfileOpen(false)}
                 user={user}
                 onLogout={handleLogout}
+                navigate={navigate}
+            />
+            <MobileDrawer
+                isOpen={mobileMenuOpen}
+                onClose={() => setMobileMenuOpen(false)}
+                user={user}
                 navigate={navigate}
             />
         </>

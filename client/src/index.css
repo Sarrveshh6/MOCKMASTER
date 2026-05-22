@@ -1,5 +1,5 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
 
 html {
   scroll-behavior: smooth;
@@ -520,5 +520,30 @@ button:active:not(:disabled) {
 @media (max-width: 480px) {
   .auth-form-container {
     padding: 25px;
+  }
+}
+
+/* ─── Mobile Responsiveness Adjustments ─── */
+@media (max-width: 768px) {
+  .main-content {
+    padding-top: 100px; /* Accounts for fixed navbar on mobile with padding */
+  }
+
+  .stacked-card {
+    border-width: 2px;
+  }
+  
+  .stacked-card::before {
+    top: 6px;
+    left: 6px;
+    border-width: 2px;
+  }
+  
+  .doodle-star {
+    transform: scale(0.7);
+  }
+
+  nav h1 {
+    font-size: 1.25rem !important; /* Slightly smaller logo text on mobile */
   }
 }
