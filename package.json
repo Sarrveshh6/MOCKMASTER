@@ -4,8 +4,8 @@
   "description": "MOCKMASTER - Intelligent Mock Test Generator API",
   "main": "server.js",
   "scripts": {
-    "start": "node --import tsx server.js",
-    "dev": "nodemon --exec \"node --import tsx\" server.js",
+    "start": "./node_modules/.bin/tsx server.js",
+    "dev": "nodemon --exec \"./node_modules/.bin/tsx\" server.js",
     "install:client": "npm install --prefix client",
     "build:client": "npm run build --prefix client",
     "build": "npm run install:client && npm run build:client"
@@ -31,12 +31,12 @@
     "openai": "^6.32.0",
     "pdf-parse": "^2.4.5",
     "pdfjs-dist": "^3.11.174",
-    "react-router-dom": "^7.13.1"
+    "react-router-dom": "^7.13.1",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
-    "nodemon": "^3.1.14",
-    "tsx": "^4.21.0",
-    "typescript": "^6.0.3"
+    "nodemon": "^3.1.14"
   }
 }
