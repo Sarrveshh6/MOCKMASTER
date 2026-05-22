@@ -214,7 +214,7 @@ const QuestionBankPage = () => {
       <div className="doodle-circle" style={{ bottom: '15%', left: '30px', backgroundColor: 'var(--bg-green)' }}></div>
 
       <header className="hero-section" style={{ padding: '3rem 2rem 2rem', marginBottom: '20px' }}>
-        <div style={{ maxWidth: '1000px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 max-w-[1000px] mx-auto">
           <div>
             <h1 style={{ margin: 0, fontSize: '3rem' }}>Question <span className="text-highlight">Bank</span></h1>
             <p style={{ margin: '10px 0 0', fontWeight: 600, fontSize: '1.1rem', opacity: 0.9 }}>
@@ -223,7 +223,7 @@ const QuestionBankPage = () => {
                 : 'Attempt Previous Year Questions (PYQs) pre-loaded by experts.'}
             </p>
           </div>
-          <button className="btn-ghost" onClick={() => navigate('/dashboard')} style={{ backgroundColor: '#fff' }}>
+          <button className="btn-ghost w-full md:w-auto" onClick={() => navigate('/dashboard')} style={{ backgroundColor: '#fff' }}>
             ← Back
           </button>
         </div>
@@ -254,7 +254,7 @@ const QuestionBankPage = () => {
           </div>
         )}
 
-        <div style={{ display: 'grid', gridTemplateColumns: view === 'user' ? '2fr 1fr 1fr 1fr' : '2fr 1fr 1fr', gap: '20px', marginBottom: '30px' }}>
+        <div className={`grid gap-4 mb-8 ${view === 'user' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'}`}>
           <div style={{ position: 'relative' }}>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: '800', fontSize: '13px', textTransform: 'uppercase' }}>Search Collection</label>
             <div style={{ position: 'relative' }}>
@@ -350,7 +350,7 @@ const QuestionBankPage = () => {
               <div key={group.key} className={`stacked-card ${view === 'user' ? 'blue' : getSubjectColor(group.label)}`} style={{ backgroundColor: '#fff', padding: '0', overflow: 'hidden' }}>
                 {/* Module Header */}
                 <div style={{ padding: '20px 24px', borderBottom: '3px solid #000', backgroundColor: '#fff' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                     <div>
                       <div className="text-label" style={{ fontSize: '0.75rem', marginBottom: '4px' }}>
                         {group.typeLabel}
@@ -361,7 +361,7 @@ const QuestionBankPage = () => {
                     </div>
                     {view === 'bank' && (
                       <button 
-                        className="btn-dark neo-brutal-btn" 
+                        className="btn-dark neo-brutal-btn w-full sm:w-auto" 
                         onClick={() => handleAttemptGroup(group, false)}
                         disabled={attemptingGroup === group.key}
                       >
@@ -374,7 +374,7 @@ const QuestionBankPage = () => {
                 {/* Module Body */}
                 <div style={{ padding: '24px' }}>
                   {view === 'user' ? (
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '14px' }}>
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                       <div>
                         <div style={{ fontWeight: 800, fontSize: '1.1rem' }}>{group.questions.length} questions available</div>
                         <p style={{ margin: '4px 0 0', fontWeight: 600, opacity: 0.7 }}>
@@ -382,16 +382,16 @@ const QuestionBankPage = () => {
                           {group.uploadedAt && ` • Uploaded: ${new Date(group.uploadedAt).toLocaleDateString()}`}
                         </p>
                       </div>
-                      <div style={{ display: 'flex', gap: '10px' }}>
+                      <div className="flex flex-wrap gap-3 w-full sm:w-auto">
                         <button
-                          className="btn-yellow"
+                          className="btn-yellow flex-1 sm:flex-none"
                           onClick={() => handleAttemptGroup(group, false)}
                           disabled={attemptingGroup === group.key}
                         >
                           {attemptingGroup === group.key ? 'Starting...' : 'Attempt PDF'}
                         </button>
                         <button
-                          className="btn-ghost"
+                          className="btn-ghost flex-1 sm:flex-none"
                           onClick={() => {
                             if (window.confirm(`Delete all ${group.questions.length} questions from this collection?`)) {
                               group.questions.forEach((q) => handleDelete(q._id, true));

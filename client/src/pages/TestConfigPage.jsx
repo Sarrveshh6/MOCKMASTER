@@ -71,7 +71,7 @@ const TestConfigPage = () => {
       <div className="doodle-circle" style={{ bottom: '10%', right: '10%', width: '40px', height: '40px', backgroundColor: 'var(--bg-green)' }}></div>
       <div className="doodle-star" style={{ bottom: '25%', left: '12%', backgroundColor: 'var(--bg-yellow)', transform: 'rotate(20deg)' }}></div>
 
-      <div className="stacked-card blue" style={{ maxWidth: '650px', margin: '0 auto', padding: 'clamp(20px, 5vw, 40px)', backgroundColor: '#fff', position: 'relative', zIndex: 2 }}>
+      <div className="stacked-card blue w-full max-w-[650px] mx-auto p-5 md:p-10 bg-white relative z-[2]">
         <h1 style={{ fontSize: '2.5rem', marginBottom: '1.5rem', textAlign: 'center' }}>Setup <span className="text-highlight">Mock Test</span></h1>
 
         {error && (
@@ -151,13 +151,13 @@ const TestConfigPage = () => {
           <div style={{ marginTop: '10px', display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
             <button
               type="button"
-              className="btn-ghost"
+              className="btn-ghost w-full md:w-auto"
               onClick={() => navigate('/dashboard')}
               style={{ flex: '1 1 100px' }}
             >
               Back
             </button>
-            <button type="submit" disabled={loading} className="btn-yellow" style={{ flex: '2 1 180px' }}>
+            <button type="submit" disabled={loading} className="btn-yellow w-full md:w-auto" style={{ flex: '2 1 180px' }}>
               {loading ? 'Preparing Test...' : 'Start Test Now!'}
             </button>
           </div>
