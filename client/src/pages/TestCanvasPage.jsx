@@ -268,6 +268,7 @@ const ExamScreen = ({ testData, questions, language, onSubmit, isSubmitting }) =
   const [marked, setMarked] = useState(new Set());
   const [timeLeft, setTimeLeft] = useState(testData.duration * 60);
   const [showInstructions, setShowInstructions] = useState(false);
+  const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const timerRef = useRef(null);
   const submitRef = useRef(onSubmit);
   const answersRef = useRef(answers);
@@ -310,6 +311,7 @@ const ExamScreen = ({ testData, questions, language, onSubmit, isSubmitting }) =
   const goTo = (idx) => {
     setVisited(v => new Set([...v, idx]));
     setCurrentIdx(idx);
+    setIsPaletteOpen(false); // Close palette on mobile when navigating
   };
 
   const handleSaveNext = () => {
@@ -361,6 +363,12 @@ const ExamScreen = ({ testData, questions, language, onSubmit, isSubmitting }) =
           </span>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
+          <button 
+            className="md:hidden flex items-center justify-center bg-gray-100 border border-gray-300 rounded px-3 cursor-pointer"
+            onClick={() => setIsPaletteOpen(true)}
+          >
+            <span style={{ fontSize: 18 }}>☰</span>
+          </button>
           <button onClick={() => setShowInstructions(true)} style={{ padding: '7px 18px', border: '1px solid #999', background: '#fff', borderRadius: 4, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
             {language === 'Hindi' ? '\u0928\u093f\u0930\u094d\u0926\u0947\u0936 \u0926\u0947\u0916\u0947\u0902' : 'View Instructions'}
           </button>
@@ -474,8 +482,29 @@ const ExamScreen = ({ testData, questions, language, onSubmit, isSubmitting }) =
 
         </div>
 
-        {/* Right palette – fixed 220px, no wobble */}
-        <div style={{ width: 220, minWidth: 220, borderLeft: '1px solid #ccc', background: '#fff', display: 'flex', flexDirection: 'column', flexShrink: 0, overflow: 'hidden' }}>
+        {/* Backdrop for mobile palette */}
+        {isPaletteOpen && (
+          <div 
+            className="fixed inset-0 bg-black/50 z-[90] md:hidden"
+            onClick={() => setIsPaletteOpen(false)}
+          />
+        )}
+
+        {/* Right palette – fixed 220px on desktop, slide-over drawer on mobile */}
+        <div className={`
+          fixed md:static inset-y-0 right-0 z-[100] md:z-auto
+          w-[260px] md:w-[220px] md:min-w-[220px]
+          bg-white border-l border-gray-300
+          flex flex-col flex-shrink-0 overflow-hidden
+          transition-transform duration-300 ease-in-out
+          ${isPaletteOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'}
+        `}>
+
+          {/* Close button on mobile */}
+          <div className="md:hidden flex justify-between items-center p-3 border-b border-gray-200 bg-gray-50">
+            <span className="font-bold text-sm">Questions</span>
+            <button onClick={() => setIsPaletteOpen(false)} className="text-xl leading-none px-2 font-bold text-gray-500">&times;</button>
+          </div>
 
           {/* Legend – vertical list, each row same height */}
           <div style={{ padding: '10px 10px 6px', borderBottom: '1px solid #eee' }}>
@@ -543,7 +572,7 @@ const ExamScreen = ({ testData, questions, language, onSubmit, isSubmitting }) =
       </div>
 
       {/* Bottom action bar – fixed to viewport so it's always visible */}
-      <div style={{ position: 'fixed', bottom: 0, left: 0, right: 220, background: '#fff', borderTop: '2px solid #ddd', padding: '10px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 50 }}>
+      <div className="fixed bottom-0 left-0 right-0 md:right-[220px] bg-white border-t-2 border-gray-300 px-3 py-2 md:p-[10px_16px] flex flex-wrap justify-between items-center gap-2 z-50">
         {/* Left: clear + previous */}
         <div style={{ display: 'flex', gap: 8 }}>
           <button onClick={handleClear} style={{ padding: '8px 14px', border: '1px solid #999', background: '#fff', borderRadius: 4, cursor: 'pointer', fontSize: 13 }}>

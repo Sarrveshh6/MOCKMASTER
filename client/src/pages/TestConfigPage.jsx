@@ -71,7 +71,7 @@ const TestConfigPage = () => {
       <div className="doodle-circle" style={{ bottom: '10%', right: '10%', width: '40px', height: '40px', backgroundColor: 'var(--bg-green)' }}></div>
       <div className="doodle-star" style={{ bottom: '25%', left: '12%', backgroundColor: 'var(--bg-yellow)', transform: 'rotate(20deg)' }}></div>
 
-      <div className="stacked-card blue" style={{ maxWidth: '650px', margin: '0 auto', padding: '40px', backgroundColor: '#fff', position: 'relative', zIndex: 2 }}>
+      <div className="stacked-card blue" style={{ maxWidth: '650px', margin: '0 auto', padding: 'clamp(20px, 5vw, 40px)', backgroundColor: '#fff', position: 'relative', zIndex: 2 }}>
         <h1 style={{ fontSize: '2.5rem', marginBottom: '1.5rem', textAlign: 'center' }}>Setup <span className="text-highlight">Mock Test</span></h1>
 
         {error && (
@@ -81,15 +81,15 @@ const TestConfigPage = () => {
         )}
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <div style={{ display: 'flex', gap: '20px' }}>
-            <div style={{ flex: 1 }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+            <div style={{ flex: '1 1 200px' }}>
               <label style={{ display: 'block', marginBottom: '8px', fontWeight: '800', fontSize: '0.9rem', textTransform: 'uppercase' }}>Question Source</label>
               <select name="source" value={config.source} onChange={handleChange} style={selectStyle}>
                 <option value="user">My Collections</option>
                 <option value="bank">Global Question Bank</option>
               </select>
             </div>
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: '1 1 200px' }}>
               <label style={{ display: 'block', marginBottom: '8px', fontWeight: '800', fontSize: '0.9rem', textTransform: 'uppercase' }}>Difficulty</label>
               <select name="difficulty" value={config.difficulty} onChange={handleChange} style={selectStyle}>
                 <option value="Mixed">Mixed</option>
@@ -129,12 +129,12 @@ const TestConfigPage = () => {
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '20px' }}>
-            <div style={{ flex: 1 }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+            <div style={{ flex: '1 1 140px' }}>
               <label style={{ display: 'block', marginBottom: '8px', fontWeight: '800', fontSize: '0.9rem', textTransform: 'uppercase' }}>Questions</label>
               <input type="number" name="count" min="1" max="100" value={config.count} onChange={handleChange} style={inputStyle} />
             </div>
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: '1 1 140px' }}>
               <label style={{ display: 'block', marginBottom: '8px', fontWeight: '800', fontSize: '0.9rem', textTransform: 'uppercase' }}>Time (mins)</label>
               <input type="number" name="duration" min="1" max="180" value={config.duration} onChange={handleChange} style={inputStyle} />
             </div>
@@ -148,16 +148,16 @@ const TestConfigPage = () => {
             </select>
           </div>
 
-          <div style={{ marginTop: '10px', display: 'flex', gap: '15px' }}>
+          <div style={{ marginTop: '10px', display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
             <button
               type="button"
               className="btn-ghost"
               onClick={() => navigate('/dashboard')}
-              style={{ flex: 1 }}
+              style={{ flex: '1 1 100px' }}
             >
               Back
             </button>
-            <button type="submit" disabled={loading} className="btn-yellow" style={{ flex: 2 }}>
+            <button type="submit" disabled={loading} className="btn-yellow" style={{ flex: '2 1 180px' }}>
               {loading ? 'Preparing Test...' : 'Start Test Now!'}
             </button>
           </div>

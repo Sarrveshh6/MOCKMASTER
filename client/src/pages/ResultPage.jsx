@@ -55,15 +55,15 @@ const ResultPage = () => {
       <div className="doodle-star" style={{ top: '60px', left: '40px', transform: 'rotate(-20deg)', backgroundColor: 'var(--bg-blue)' }}></div>
       <div className="doodle-circle" style={{ bottom: '20%', right: '5%', backgroundColor: 'var(--bg-pink)' }}></div>
 
-      <header className="hero-section" style={{ padding: '4rem 2rem', marginBottom: '40px' }}>
-        <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <header className="hero-section" style={{ padding: '2rem 1rem', marginBottom: '40px' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
           <div>
-            <h1 style={{ margin: 0, fontSize: '3rem' }}>Test <span className="text-highlight">Results</span></h1>
-            <p style={{ margin: '10px 0 0', fontWeight: 600, fontSize: '1.2rem', opacity: 0.9 }}>
+            <h1 style={{ margin: 0, fontSize: 'clamp(1.8rem, 5vw, 3rem)' }}>Test <span className="text-highlight">Results</span></h1>
+            <p style={{ margin: '10px 0 0', fontWeight: 600, fontSize: '1rem', opacity: 0.9 }}>
               Detailed breakdown of your performance.
             </p>
           </div>
-          <div style={{ display: 'flex', gap: '15px' }}>
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
             <button className="btn-ghost" onClick={() => navigate('/dashboard')} style={{ backgroundColor: '#fff' }}>Dashboard</button>
             <button className="btn-yellow" onClick={() => navigate('/test-config')}>Take Another →</button>
           </div>
@@ -91,11 +91,11 @@ const ResultPage = () => {
             return (
               <div key={idx} className="stacked-card" style={{ padding: '25px', backgroundColor: '#fff' }}>
                 {/* Question header */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
-                  <p style={{ fontWeight: '800', fontSize: '1.05rem', margin: 0, flex: 1, lineHeight: 1.5 }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', gap: '10px' }}>
+                  <p style={{ fontWeight: '800', fontSize: '1.05rem', margin: 0, flex: 1, lineHeight: 1.5, minWidth: '200px' }}>
                     {idx + 1}. {qr.questionId?.questionText}
                   </p>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, marginLeft: 16, flexShrink: 0 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flexShrink: 0 }}>
                     <span style={{ fontSize: '12px', padding: '4px 10px', backgroundColor: statusColor, border: '2px solid #000', borderRadius: '20px', fontWeight: 800 }}>
                       {statusText}
                     </span>

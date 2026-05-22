@@ -50,7 +50,7 @@ const PDFDropzone = ({ onFileSelect, file }) => {
       />
       <div style={{ fontSize: '3rem', marginBottom: '12px' }}></div>
       {file ? (
-        <p style={{ fontWeight: 800, fontSize: '1.1rem', color: '#2a7a2a' }}>
+        <p style={{ fontWeight: 800, fontSize: '1.1rem', color: '#2a7a2a', wordBreak: 'break-all' }}>
           ✅ Selected: {file.name}
         </p>
       ) : (
@@ -219,7 +219,7 @@ const UploadPage = () => {
       <div style={{ maxWidth: '750px', margin: '0 auto' }}>
 
         {/* Header */}
-        <h1 style={{ fontSize: '2.8rem', marginBottom: '0.5rem', fontWeight: 900 }}>
+        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 2.8rem)', marginBottom: '0.5rem', fontWeight: 900, lineHeight: 1.3 }}>
           Upload <span style={{
             background: 'var(--bg-pink, #ffb3c6)',
             padding: '0 8px',
@@ -351,7 +351,7 @@ const UploadPage = () => {
           )}
 
           {/* Action Buttons */}
-          <div style={{ marginTop: '32px', display: 'flex', justifyContent: 'flex-end', gap: '16px' }}>
+          <div style={{ marginTop: '32px', display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-end', gap: '16px' }}>
             <button
               type="button"
               onClick={() => navigate('/dashboard')}
