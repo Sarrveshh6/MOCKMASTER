@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 5000;
 
 connectDB()
   .then(async () => {
-    const authMod = await import('./lib/auth.ts');
+    const authMod = await import('./lib/auth.js');
     const { auth } = authMod.default || authMod;
     const { toNodeHandler } = await import('better-auth/node');
     const betterAuthHandler = toNodeHandler(auth);
