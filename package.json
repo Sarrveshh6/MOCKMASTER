@@ -8,7 +8,7 @@
     "dev": "nodemon server.js",
     "install:client": "npm install --prefix client",
     "build:client": "npm run build --prefix client",
-    "build": "npm run install:client && npm run build:client"
+    "build": "npm install && npm run install:client && npm run build:client"
   },
   "keywords": [],
   "author": "",
