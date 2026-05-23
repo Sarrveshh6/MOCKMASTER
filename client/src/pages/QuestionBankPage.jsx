@@ -69,12 +69,13 @@ const QuestionBankPage = () => {
       filtered = questions.filter(q => 
         q.questionText.toLowerCase().includes(term) ||
         (q.subject && q.subject.toLowerCase().includes(term)) ||
-        (q.topic && q.topic.toLowerCase().includes(term))
+        (q.topic && q.topic.toLowerCase().includes(term)) ||
+        (q.documentId?.originalName && q.documentId.originalName.toLowerCase().includes(term))
       );
     }
 
-    // Time filter (Client-side for now to avoid complex backend queries for nested populate fields)
-    if (view === 'user' && filters.time !== 'all') {
+    // Time filter (Client-side)
+    if (filters.time !== 'all') {
       const now = new Date();
       filtered = filtered.filter(q => {
         if (!q.documentId?.uploadedAt) return false;
@@ -91,92 +92,71 @@ const QuestionBankPage = () => {
     const groups = {};
 
     filtered.forEach((q) => {
-      if (view === 'user') {
-        const docId = q.documentId?._id || q.documentId;
-        const fileName = q.documentId?.originalName;
-        const uploadedAt = q.documentId?.uploadedAt;
-        const key = docId || (q.source.includes('AI') ? 'ai-no-document' : 'manual-group');
-        const label = fileName || (q.source.includes('AI') ? 'AI Extracted (Unknown PDF)' : 'Manual / Other Questions');
-        
-        if (!groups[key]) {
-          groups[key] = { label, typeLabel: 'PDF Group', questions: [], uploadedAt };
-        }
-        groups[key].questions.push(q);
-      } else {
-        // Group by Subject for Global Bank
-        const subject = q.subject || 'General';
-        const topic = q.topic || 'General';
-        
-        if (!groups[subject]) {
-          groups[subject] = { 
-            label: subject, 
-            typeLabel: 'Subject Module', 
-            topics: {} 
-          };
-        }
-        
-        if (!groups[subject].topics[topic]) {
-          groups[subject].topics[topic] = [];
-        }
-        groups[subject].topics[topic].push(q);
+      const docId = q.documentId?._id || q.documentId;
+      const fileName = q.documentId?.originalName;
+      const uploadedAt = q.documentId?.uploadedAt;
+      
+      let key = docId;
+      let label = fileName;
+      
+      if (!key) {
+         if (view === 'bank') {
+           key = q.subject ? `legacy-${q.subject}` : 'general-bank';
+           label = q.subject ? `${q.subject} (Legacy Bank Questions)` : 'General Bank Questions';
+         } else {
+           key = q.source.includes('AI') ? 'ai-no-document' : 'manual-group';
+           label = q.source.includes('AI') ? 'AI Extracted (Unknown PDF)' : 'Manual / Other Questions';
+         }
       }
+
+      if (!groups[key]) {
+        groups[key] = { 
+          label, 
+          typeLabel: view === 'bank' ? 'Global PYQ Paper' : 'PDF Group', 
+          questions: [], 
+          uploadedAt 
+        };
+      }
+      groups[key].questions.push(q);
     });
 
-    if (view === 'user') {
-      return Object.entries(groups)
-        .map(([key, value]) => ({ key, ...value }))
-        .sort((a, b) => {
-          // Newest PDF on top
-          const dateA = a.uploadedAt ? new Date(a.uploadedAt) : new Date(0);
-          const dateB = b.uploadedAt ? new Date(b.uploadedAt) : new Date(0);
-          return dateB - dateA;
-        });
-    } else {
-      // Hierarchical grouping for Bank View
-      return Object.entries(groups).map(([subject, data]) => ({
-        key: subject,
-        label: subject,
-        typeLabel: 'Subject Module',
-        topicGroups: Object.entries(data.topics).map(([topicName, qs]) => ({
-          name: topicName,
-          questions: qs
-        })).sort((a, b) => b.questions.length - a.questions.length)
-      })).sort((a, b) => a.label.localeCompare(b.label));
-    }
+    return Object.entries(groups)
+      .map(([key, value]) => ({ key, ...value }))
+      .sort((a, b) => {
+        // Newest PDF on top
+        const dateA = a.uploadedAt ? new Date(a.uploadedAt) : new Date(0);
+        const dateB = b.uploadedAt ? new Date(b.uploadedAt) : new Date(0);
+        return dateB - dateA;
+      });
   }, [questions, view, filters]);
 
-  const handleAttemptGroup = async (groupOrTopic, isTopic = false) => {
-    // For user view, we need a document ID.
-    if (view === 'user' && (!groupOrTopic.key || groupOrTopic.key === 'ai-no-document' || groupOrTopic.key === 'manual-group')) {
-      alert('This group has no linked PDF document to attempt from.');
+  const handleAttemptGroup = async (groupOrTopic) => {
+    const hasValidDocId = groupOrTopic.key && groupOrTopic.key.length === 24;
+
+    if (!hasValidDocId && !window.confirm('This group may not have a linked PDF. Attempt anyway?')) {
       return;
     }
 
     try {
-      const loadingKey = isTopic ? groupOrTopic.name : groupOrTopic.key;
-      setAttemptingGroup(loadingKey);
+      setAttemptingGroup(groupOrTopic.key);
       
       let res;
-      if (view === 'user') {
+      if (hasValidDocId) {
         res = await api.post('/test/generate-by-document', {
           documentId: groupOrTopic.key,
           count: groupOrTopic.questions.length,
           mode: 'Test',
-          source: 'user'
+          source: view
         });
       } else {
-        // For Bank group (Subject or Topic)
-        const subject = isTopic ? groupOrTopic.subject : groupOrTopic.label;
-        const topic = isTopic ? groupOrTopic.name : '';
-        const count = isTopic ? groupOrTopic.questions.length : 20;
-
+        // Fallback for legacy bank/user questions without a document ID
         res = await api.get('/test/generate', {
           params: {
-            subject,
-            topic,
-            count: Math.min(count, 30),
+            subject: view === 'bank' ? groupOrTopic.label.replace(' (Legacy Bank Questions)', '') : 'All',
+            topic: 'All',
+            count: Math.min(groupOrTopic.questions.length, 30),
             mode: 'Test',
-            source: 'bank'
+            source: view
           }
         });
       }
@@ -301,22 +281,20 @@ const QuestionBankPage = () => {
               <option value="Hard">Hard</option>
             </select>
           </div>
-          {view === 'user' && (
-            <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '800', fontSize: '13px', textTransform: 'uppercase' }}>Uploaded Within</label>
-              <select 
-                name="time" 
-                value={filters.time} 
-                onChange={handleFilterChange}
-                style={{ width: '100%', padding: '12px', border: '3px solid #000', borderRadius: '12px', fontWeight: '800', outline: 'none', backgroundColor: '#fff' }}
-              >
-                <option value="all">All Time</option>
-                <option value="24h">Last 24 Hours</option>
-                <option value="7d">Last 7 Days</option>
-                <option value="30d">Last 30 Days</option>
-              </select>
-            </div>
-          )}
+          <div>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '800', fontSize: '13px', textTransform: 'uppercase' }}>Uploaded Within</label>
+            <select 
+              name="time" 
+              value={filters.time} 
+              onChange={handleFilterChange}
+              style={{ width: '100%', padding: '12px', border: '3px solid #000', borderRadius: '12px', fontWeight: '800', outline: 'none', backgroundColor: '#fff' }}
+            >
+              <option value="all">All Time</option>
+              <option value="24h">Last 24 Hours</option>
+              <option value="7d">Last 7 Days</option>
+              <option value="30d">Last 30 Days</option>
+            </select>
+          </div>
         </div>
 
         <style>
@@ -362,10 +340,10 @@ const QuestionBankPage = () => {
                     {view === 'bank' && (
                       <button 
                         className="btn-dark neo-brutal-btn w-full sm:w-auto" 
-                        onClick={() => handleAttemptGroup(group, false)}
+                        onClick={() => handleAttemptGroup(group)}
                         disabled={attemptingGroup === group.key}
                       >
-                        Practice All
+                        Attempt Paper
                       </button>
                     )}
                   </div>
@@ -373,23 +351,23 @@ const QuestionBankPage = () => {
 
                 {/* Module Body */}
                 <div style={{ padding: '24px' }}>
-                  {view === 'user' ? (
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                      <div>
-                        <div style={{ fontWeight: 800, fontSize: '1.1rem' }}>{group.questions.length} questions available</div>
-                        <p style={{ margin: '4px 0 0', fontWeight: 600, opacity: 0.7 }}>
-                          Source: {group.label} 
-                          {group.uploadedAt && ` • Uploaded: ${new Date(group.uploadedAt).toLocaleDateString()}`}
-                        </p>
-                      </div>
-                      <div className="flex flex-wrap gap-3 w-full sm:w-auto">
-                        <button
-                          className="btn-yellow flex-1 sm:flex-none"
-                          onClick={() => handleAttemptGroup(group, false)}
-                          disabled={attemptingGroup === group.key}
-                        >
-                          {attemptingGroup === group.key ? 'Starting...' : 'Attempt PDF'}
-                        </button>
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                      <div style={{ fontWeight: 800, fontSize: '1.1rem' }}>{group.questions.length} questions available</div>
+                      <p style={{ margin: '4px 0 0', fontWeight: 600, opacity: 0.7 }}>
+                        Source: {group.label} 
+                        {group.uploadedAt && ` • Uploaded: ${new Date(group.uploadedAt).toLocaleDateString()}`}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-3 w-full sm:w-auto">
+                      <button
+                        className="btn-yellow flex-1 sm:flex-none"
+                        onClick={() => handleAttemptGroup(group)}
+                        disabled={attemptingGroup === group.key}
+                      >
+                        {attemptingGroup === group.key ? 'Starting...' : 'Attempt Paper'}
+                      </button>
+                      {(view === 'user' || user?.role === 'admin') && (
                         <button
                           className="btn-ghost flex-1 sm:flex-none"
                           onClick={() => {
@@ -401,41 +379,9 @@ const QuestionBankPage = () => {
                         >
                           Delete
                         </button>
-                      </div>
+                      )}
                     </div>
-                  ) : (
-                    /* Bank View Topics List */
-                    <div style={{ display: 'grid', gap: '12px' }}>
-                      {group.topicGroups.map((topic) => (
-                        <div 
-                          key={topic.name} 
-                          style={{ 
-                            display: 'flex', 
-                            justifyContent: 'space-between', 
-                            alignItems: 'center', 
-                            padding: '14px 18px', 
-                            backgroundColor: '#f8f8f8', 
-                            border: '2px solid #000', 
-                            borderRadius: '12px',
-                            transition: 'all 0.2s'
-                          }}
-                          className="topic-row"
-                        >
-                          <div>
-                            <div style={{ fontWeight: 800, fontSize: '1rem' }}>{topic.name}</div>
-                            <div style={{ fontWeight: 600, fontSize: '0.85rem', opacity: 0.6 }}>{topic.questions.length} questions</div>
-                          </div>
-                          <button 
-                            className="btn-yellow neo-brutal-btn"
-                            onClick={() => handleAttemptGroup({ ...topic, subject: group.label }, true)}
-                            disabled={attemptingGroup === topic.name}
-                          >
-                            {attemptingGroup === topic.name ? '...' : 'Quick Start'}
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  </div>
                 </div>
               </div>
             ))}
