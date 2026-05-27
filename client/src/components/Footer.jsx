@@ -75,6 +75,7 @@ const Footer = () => {
               { label: 'DOCUMENTATION', to: '/docs' },
               { label: 'API REFERENCE', to: '/api-reference' },
               { label: 'SUPPORT', to: '/support' },
+              { label: 'PORTFOLIO', to: 'https://portfolio-lemon-kappa-56.vercel.app/' },
             ].map((link) => (
               <li key={link.label}>
                 <Link to={link.to} style={{ textDecoration: 'none', color: '#000', fontWeight: 700, fontSize: '0.9rem', transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f93109ff'} onMouseOut={(e) => e.target.style.color = '#000'}>
